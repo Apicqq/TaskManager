@@ -34,8 +34,11 @@ class TaskSubtaskBaseModel(models.Model):
         max_length=100,
         choices=TASK_STATUSES,
     )
-    planned_intensity = models.IntegerField()
-    actual_completion_time = models.DateTimeField(null=True)
+    planned_intensity = models.IntegerField(blank=True)
+    actual_completion_time = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.name}: {self.description}"
