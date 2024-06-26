@@ -1,3 +1,4 @@
+from enum import Enum, auto
 
 TASK_STATUSES = (
     ("Assigned", "Назначена"),
@@ -5,3 +6,10 @@ TASK_STATUSES = (
     ("Paused", "Приостановлена"),
     ("Completed", "Завершена"),
 )
+
+
+class Literals(Enum):
+    COMPLETED = auto()
+    IN_PROGRESS = auto()
+    PAUSED = auto()
+    ASSIGNED = auto()
