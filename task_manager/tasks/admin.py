@@ -4,9 +4,16 @@ from django.contrib import admin
 from tasks.models import TaskModel, SubTask
 
 
+class SubTaskInline(admin.TabularInline):
+    model = SubTask
+    extra = 0
+    max = 3
+
+
 @admin.register(TaskModel)
 class TaskAdmin(admin.ModelAdmin):
-    pass
+    inlines = [SubTaskInline]
+
 
 @admin.register(SubTask)
 class SubTaskAdmin(admin.ModelAdmin):
