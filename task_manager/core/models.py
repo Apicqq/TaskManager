@@ -9,10 +9,6 @@ class TaskSubtaskBaseModel(models.Model):
     Базовая модель для задач и подзадач, включающая в себя схожие поля.
     """
 
-    name = models.CharField(
-        max_length=100,
-        verbose_name="Название задачи",
-    )
     description = models.TextField(
         verbose_name="Описание задачи",
     )
@@ -25,23 +21,24 @@ class TaskSubtaskBaseModel(models.Model):
         verbose_name="Дата регистрации задачи",
         auto_now_add=True,
     )
-    deadline = models.DateTimeField(
-        verbose_name="Дата завершения задачи",
-        null=True,
-    )
     status = models.CharField(
         verbose_name="Статус задачи",
         max_length=100,
         choices=TASK_STATUSES,
+        default=TASK_STATUSES[0][0],
     )
-    planned_intensity = models.IntegerField(blank=True)
-    actual_completion_time = models.DateTimeField(
+    planned_intensity = models.IntegerField(
+        verbose_name="Планируемая интенсивность",
+        blank=True
+    )
+    deadline = models.DateTimeField(
+        verbose_name="Дата завершения задачи",
         null=True,
-        blank=True,
     )
-
-    def __str__(self):
-        return f"{self.name}: {self.description}"
+    actual_completion_time = models.IntegerField(
+        "Фактическое время выполнения",
+        help_text="В часах",
+    )
 
     class Meta:
         abstract = True
