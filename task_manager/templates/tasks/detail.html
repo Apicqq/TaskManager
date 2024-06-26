@@ -1,0 +1,48 @@
+{% extends "base/index.html" %}
+{% block title %}
+  {{ object.name }}
+{% endblock title %}
+{% block content %}
+  {% with request.path as path %}
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header">
+              {% if "subtask" in path %}
+                <h2>Подзадача: {{ object.name }}</h2>
+              {% else %}
+                <h2>Задача: {{ object.name }}</h2>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              <p>Описание: {{ object.description }}</p>
+              <p>Планируемая дата выполнения: {{ object.deadline|date }}</p>
+              <p>Назначенные лица: {{ object.performers }}</p>
+              <p>Задача создана: {{ object.created_at|date }}</p>
+              <p>Статус задачи: {{ object.status }}</p>
+              <p>Планируемая интенсивность
+                задачи: {{ object.planned_intensity }}</p>
+              <p>Фактическое время выполнения (в часах): {{ object.actual_completion_time}}</p>
+            </div>
+            {% if "subtask" in path %}
+              <div class="card-footer">
+                <a href="{% url 'update_subtask' object.task.id object.id %}"
+                   class="btn btn-primary">Редактировать подзадачу</a>
+                <a href="{% url 'delete_subtask' object.task.id subtask.id %}"
+                   class="btn btn-danger">Удалить подзадачу</a>
+              </div>
+            {% else %}
+              <div class="card-footer">
+                <a href="{% url 'update_task' object.id %}"
+                   class="btn btn-primary">Редактировать задачу</a>
+                <a href="{% url 'delete_task' object.id %}"
+                   class="btn btn-danger">Удалить задачу</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endwith %}
+{% endblock %}
