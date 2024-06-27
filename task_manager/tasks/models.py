@@ -51,14 +51,3 @@ class SubTask(TaskSubtaskBaseModel):
 
     def __str__(self):
         return f"{self.name}: {self.description}"
-
-    def to_json(self):
-        return dict(
-            id=self.id,
-            name=self.name,
-            description=self.description,
-            deadline=self.deadline,
-            status=self.status,
-            planned_intensity=self.planned_intensity,
-            actual_completion_time=self.actual_completion_time
-        )
