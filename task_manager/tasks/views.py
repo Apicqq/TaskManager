@@ -1,9 +1,6 @@
-from django.db.models import Sum
 from django.db.transaction import atomic
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
-from django.template.loader import render_to_string
-from django.template.response import TemplateResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     ListView,
@@ -14,9 +11,10 @@ from django.views.generic import (
 )
 
 from tasks.forms import TaskForm, SubTaskFormset, SubTaskForm, TaskEditForm, \
-    SubTaskEditForm
+    SubTaskEditForm, SubTaskInlineFormset
 from tasks.mixins import TaskMixin, SubTaskMixin
-from tasks.models import SubTask
+from tasks.models import SubTask, TaskModel
+from tasks.utils import calculate_task_values
 
 
 class TaskListView(TaskMixin, ListView):
@@ -52,20 +50,7 @@ class TaskCreateView(TaskMixin, CreateView):
                 subtask = subtask_form.save(commit=False)
                 subtask.task = instance
                 subtask.save()
-            if instance.subtasks.exists():
-                subtask_sums = instance.subtasks.aggregate(
-                    planned_intensity=Sum("planned_intensity"),
-                    actual_completion_time=Sum("actual_completion_time"),
-                )
-                instance.planned_intensity = (
-                        subtask_sums['planned_intensity']
-                        + instance.planned_intensity
-                )
-                instance.actual_completion_time = (
-                        subtask_sums['actual_completion_time']
-                        + instance.actual_completion_time
-                )
-                instance.save()
+            calculate_task_values(instance)
             return redirect(self.success_url)
         else:
             return self.render_to_response(
@@ -73,17 +58,38 @@ class TaskCreateView(TaskMixin, CreateView):
 
 
 class TaskDeleteView(TaskMixin, DeleteView):
-    pass
+    success_url = reverse_lazy("task_list")
 
 
 class TaskUpdateView(TaskMixin, UpdateView):
     template_name = "tasks/update.html"
     form_class = TaskEditForm
 
+    def get_object(self, queryset=None):
+        return get_object_or_404(TaskModel, pk=self.kwargs["task_id"])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        return dict(
+            **context,
+            formset=SubTaskInlineFormset(
+                instance=self.get_object(),
+            ),
+        )
 
-        return context
+    @atomic
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        formset = SubTaskInlineFormset(request.POST, instance=self.object)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            calculate_task_values(self.object)
+            return redirect(self.get_success_url())
+        else:
+            return self.render_to_response(
+                self.get_context_data(form=form, formset=formset))
 
     def get_success_url(self):
         return reverse("task_detail", kwargs={"task_id": self.object.pk})
@@ -94,7 +100,7 @@ class SubTaskCreateView(SubTaskMixin, CreateView):
 
 
 class SubTaskDeleteView(SubTaskMixin, DeleteView):
-    pass
+    success_url = reverse_lazy("task_list")
 
 
 class SubTaskUpdateView(SubTaskMixin, UpdateView):
@@ -137,3 +143,10 @@ def add_task(request):
         formset = SubTaskFormset(prefix=request.GET.get('prefix'),
                                  queryset=SubTask.objects.none())
         return JsonResponse({"formset": formset})
+
+
+def task_view(request, task_id, subtask_id):
+    if request.is_ajax():
+        task_content = f"Content for Subtask {subtask_id} of Task {task_id}"
+
+        return JsonResponse({"content": task_content})

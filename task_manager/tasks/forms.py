@@ -12,6 +12,11 @@ class SubTaskForm(forms.ModelForm):
             "deadline", "status", "planned_intensity",
             "actual_completion_time",
         ]
+        widgets = dict(
+            deadline=forms.DateInput(
+                format="%Y-%m-%d", attrs={"type": "date"}
+            ),
+        )
 
 
 class TaskForm(forms.ModelForm):
@@ -64,8 +69,21 @@ SubTaskFormset = forms.modelformset_factory(
     form=TaskForm
 )
 
+SubTaskInlineFormset = forms.inlineformset_factory(
+    TaskModel,
+    SubTask,
+    fields=["name", "description", "performers", "deadline", "status",
+            "planned_intensity", "actual_completion_time"],
+    extra=1,
+    form=SubTaskForm
+)
+
 
 class TaskEditForm(TaskForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     planned_intensity = forms.IntegerField(
         label="Планируемая интенсивность задачи",
         disabled=True

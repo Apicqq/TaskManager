@@ -2,11 +2,28 @@
 {% load django_bootstrap5 %}
 {% block title %} Редактирование поздадачи {{ subtask.name }} {% endblock %}
 {% block content %}
-  <form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  <div id="button-container">
-    {% bootstrap_button button_type="submit" content="Отправить" %}
+  <div class="col d-flex justify-content-center">
+    <div class="card" style="width: 40rem; height: max-content;">
+      <div class="card-header">Создать задачу</div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data"
+              class="form-container">
+          {% csrf_token %}
+          <div class="task-form">
+          {% bootstrap_form form %}
+            </div>
+          <br>
+          {{ formset.management_form }}
+          {% for formset_form in formset.forms %}
+          <div class="subtask-form">
+            {% bootstrap_form formset_form %}
+          </div>
+          {% endfor %}
+          <div id="button-container">
+            {% bootstrap_button button_type="submit" content="Отправить" %}
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
-  </form>
 {% endblock %}
