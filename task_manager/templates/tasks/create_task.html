@@ -19,96 +19,23 @@
               {% bootstrap_form formset_form %}
             </div>
           {% endfor %}
-          <div id="empty_form">
-            <div class="subtask-form">
-              {% bootstrap_form formset.empty_form %}
-            </div>
-          </div>
           <br>
-                  <div id="button-container">
-            <button type="button" class="btn btn-primary"
-                    id="add-subtask-button">Добавить подзадачу
-            </button>
-          </div><br>
           <div id="button-submit-form">
             {% bootstrap_button button_type="submit" content="Отправить" %}
           </div>
         </form>
+      <br>
       </div>
     </div>
   </div>
-  <script src="{% static 'js/jquery.js' %}"></script>
-  {#  <script>#}
-  {#      $(document).ready(function () {#}
-  {#          var formsetIndex = {{ formset.management_form.form.prefix|length }};#}
-  {#          $('#add-subtask-button').click(function () {#}
-  {#              $.ajax({#}
-  {#                  url: "{% url 'add_subtask' %}",#}
-  {#                  data: {#}
-  {#                      prefix: '{{ formset.prefix }}',#}
-  {#                      formsetIndex: formsetIndex#}
-  {#                  },#}
-  {#                  success: function (data) {#}
-  {#                      $('#subtask-form').append(data.formset);#}
-  {#                      formsetIndex++;#}
-  {#                  }#}
-  {#              });#}
-  {#          });#}
-  {#      });#}
-  {#  </script>#}
-  {#  <script>#}
-  {#      let subtaskForm = document.querySelectorAll(".subtask-form")#}
-  {#      let container = document.querySelector(".form-container")#}
-  {#      let addButton = document.querySelector("#add-subtask-button")#}
-  {#      let totalForms = document.querySelector("#id_form-TOTAL_FORMS")#}
-  {##}
-  {#      let forNum = subtaskForm.length - 1#}
-  {#      addButton.addEventListener("click", addForm)#}
-  {##}
-  {#      function addForm(e) {#}
-  {#          e.preventDefault()#}
-  {##}
-  {#          let newForm = subtaskForm[0].cloneNode(true)#}
-  {#          let formRegex = RegExp(`form-(\\d){1}-`, 'g')#}
-  {##}
-  {#          forNum++#}
-  {#          newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${forNum}-`)#}
-  {#          container.insertBefore(newForm, addButton)#}
-  {#          totalForms.setAttribute('value', `${forNum + 1}`)#}
-  {#      }#}
-  {#  </script>#}
-<script>
-$("#add-subtask-button").click(function () {
-    let form_idx = $("#id_form-TOTAL_FORMS").val();
-    let newForm = $("#empty_form").clone();
-    newForm.find("input").each(function () {
-        let name = $(this).attr("name");
-        if (name) {
-            let newPrefix = name.replace(/__prefix__/, form_idx);
-            $(this).attr("name", newPrefix);
-        }
-    });
-    $(".subtask-form").append(newForm);
-    $("#id_form-TOTAL_FORMS").val(parseInt(form_idx) + 1);
-});
-
-$(document).on("submit", "#subtask-form", function (event) {
-    event.preventDefault();
-    let formData = new FormData(this);
-    $.ajax({
-        url: this.action,
-        method: this.method,
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (response) {
-            // Handle success response
-        },
-        error: function (xhr, status, error) {
-            // Handle error
-        }
-    });
-});
-</script>
-{% endblock %}
+{% endblock content %}
+{% block scripts %}
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/jquery.formset.js' %}"></script>
+  <script type="text/javascript">
+      $(function () {
+          $('.subtask-form').formset();
+      })
+  </script>
+{% endblock scripts %}
 
