@@ -2,7 +2,6 @@
 {% load django_bootstrap5 %}
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,6 +19,6 @@
   {% block content %}{% endblock content %}
 </div>
 {% include "base/javascripts.html" %}
-{% include "base/footer.html" %}
+{% block scripts %}{% endblock %}
 </body>
 </html>
