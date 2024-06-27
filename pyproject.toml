@@ -11,6 +11,10 @@ django = "^5.0.6"
 django-bootstrap5 = "^24.2"
 
 
+[tool.poetry.group.testing.dependencies]
+pytest = "^8.2.2"
+pytest-django = "^4.8.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
