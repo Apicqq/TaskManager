@@ -1,4 +1,5 @@
 {% extends "base/index.html" %}
+{% load static %}
 {% block title %}
   {{ object.name }}
 {% endblock title %}
@@ -23,21 +24,65 @@
               <p>Статус задачи: {{ object.status }}</p>
               <p>Планируемая интенсивность
                 задачи: {{ object.planned_intensity }}</p>
-              <p>Фактическое время выполнения (в часах): {{ object.actual_completion_time}}</p>
+              <p>Фактическое время выполнения (в
+                часах): {{ object.actual_completion_time }}</p>
             </div>
+            {% if object.subtasks %}
+              <div class="card-body">
+                <h3>Подзадачи:</h3>
+                <div class="row">
+                  {% for subtask in object.subtasks.all %}
+                    <div class="col-md-4">
+                      <div class="card">
+                        <div class="card-body">
+                          <h5 class="card-title">{{ subtask.name }}</h5>
+                          <p class="card-text">{{ subtask.description }}</p>
+                          <p class="card-text">Статус
+                            подзадачи: {{ subtask.status }}</p>
+                          <p class="card-text">Планируемая дата
+                            выполнения: {{ subtask.deadline|date }}</p>
+                          <p class="card-text">Назначенные
+                            лица: {{ subtask.performers }}</p>
+                          <p class="card-text">Планируемая интенсивность
+                          задачи: {{ subtask.planned_intensity }}</p>
+                          <p class="card-text">Фактическое время выполнения (в
+                            часах): {{ subtask.actual_completion_time }}</p>
+                          <a href="{% url 'subtask_detail' object.id subtask.id %}"
+                             class="btn btn-primary">Открыть подзадачу</a>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
             {% if "subtask" in path %}
               <div class="card-footer">
                 <a href="{% url 'update_subtask' object.task.id object.id %}"
                    class="btn btn-primary">Редактировать подзадачу</a>
-                <a href="{% url 'delete_subtask' object.task.id subtask.id %}"
-                   class="btn btn-danger">Удалить подзадачу</a>
+                <form id="subtask-delete" method="post"
+                      action="{% url "delete_subtask" object.task_id subtask.id %}">
+                  {% csrf_token %}
+                  <a href="{% url "delete_subtask" object.task_id subtask.id %}">
+                    <button class="btn btn-danger" onclick="deleteSubtask()">
+                      Удалить подзадачу
+                    </button>
+                  </a>
+                </form>
               </div>
             {% else %}
               <div class="card-footer">
                 <a href="{% url 'update_task' object.id %}"
                    class="btn btn-primary">Редактировать задачу</a>
-                <a href="{% url 'delete_task' object.id %}"
-                   class="btn btn-danger">Удалить задачу</a>
+                <form id="task-delete" method="post"
+                      action={% url "delete_task" object.id %}>
+                  {% csrf_token %}
+                  <a href="{% url "delete_task" object.id %}">
+                    <button class="btn btn-danger" onclick="deleteTask()">
+                      Удалить задачу
+                    </button>
+                  </a>
+                </form>
               </div>
             {% endif %}
           </div>
@@ -45,4 +90,24 @@
       </div>
     </div>
   {% endwith %}
-{% endblock %}
+{% endblock content %}
+{% block scripts %}
+  <script>
+      function deleteTask(e) {
+          if (!confirm("Вы точно хотите удалить эту задачу?")) {
+              e.preventDefault();
+          } else {
+              $("#task-delete").submit();
+          }
+      }
+  </script>
+  <script>
+      function deleteSubtask(e) {
+          if (!confirm("Вы точно хотите удалить эту подзадачу?")) {
+              e.preventDefault();
+          } else {
+              $("subtask-delete").submit();
+          }
+      }
+  </script>
+{% endblock scripts %}
