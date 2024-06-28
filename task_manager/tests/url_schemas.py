@@ -1,11 +1,11 @@
 TASK_GET_URLS = [
     "/",
-    "/1/",
+    "/tasks/1/",
 ]
 TASK_POST_URLS = [
     "/create_task/",
-    "/task/<int:task_id>/update_task/",
-    "/task/<int:task_id>/delete/",
+    "/tasks/1/update_task/",
+    "/tasks/1/delete_task/",
 ]
 SUBTASK_GET_URLS = [
     "/task/<int:task_id>/subtasks/",
