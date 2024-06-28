@@ -29,7 +29,6 @@ class TaskSubtaskBaseModel(models.Model):
     )
     planned_intensity = models.IntegerField(
         verbose_name="Планируемая интенсивность",
-        blank=True
     )
     deadline = models.DateTimeField(
         verbose_name="Дата завершения задачи",
