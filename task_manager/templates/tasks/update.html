@@ -1,10 +1,15 @@
 {% extends "base/index.html" %}
+{% load static %}
 {% load django_bootstrap5 %}
 {% block title %} Редактирование поздадачи {{ subtask.name }} {% endblock %}
 {% block content %}
   <div class="col d-flex justify-content-center">
     <div class="card" style="width: 40rem; height: max-content;">
-      <div class="card-header">Создать задачу</div>
+      {% if "subtask" in request.path %}
+        <div class="card-header">Редактирование подзадачи: <b>{{ object.name|safe }}</b></div>
+      {% else %}
+      <div class="card-header">Редактирование задачи: <b>{{ object.name|safe }}</b></div>
+      {% endif %}
       <div class="card-body">
         <form method="post" enctype="multipart/form-data"
               class="form-container">
@@ -13,12 +18,13 @@
           {% bootstrap_form form %}
             </div>
           <br>
-          {{ formset.management_form }}
           {% for formset_form in formset.forms %}
-          <div class="subtask-form">
-            {% bootstrap_form formset_form %}
-          </div>
+            {{ formset.management_form }}
+            <div class="subtask-form">
+              {% bootstrap_form formset_form %}
+            </div>
           {% endfor %}
+          <br>
           <div id="button-container">
             {% bootstrap_button button_type="submit" content="Отправить" %}
           </div>
@@ -27,3 +33,13 @@
     </div>
   </div>
 {% endblock %}
+{% block scripts %}
+  <script src="{% static 'js/jquery.formset.js' %}"></script>
+  <script type="text/javascript">
+      $(function () {
+          $('.subtask-form').formset({
+              prefix: '{{ formset.prefix }}'
+          });
+      })
+  </script>
+{% endblock scripts %}

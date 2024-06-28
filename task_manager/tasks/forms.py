@@ -21,10 +21,6 @@ class SubTaskForm(forms.ModelForm):
 
 class TaskForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.formset = SubTaskFormset
-
     def clean_status(self):
         if self.initial.get("status") is not None:
             initial_status, new_status = (
@@ -61,29 +57,27 @@ class TaskForm(forms.ModelForm):
         )
 
 
-SubTaskFormset = forms.modelformset_factory(
+TaskCreateFormSet = forms.modelformset_factory(
     SubTask,
     fields=["name", "description", "performers", "deadline", "status",
             "planned_intensity", "actual_completion_time"],
     extra=1,
+    can_delete=False,
     form=TaskForm
 )
 
-SubTaskInlineFormset = forms.inlineformset_factory(
+TaskUpdateFormSet = forms.inlineformset_factory(
     TaskModel,
     SubTask,
     fields=["name", "description", "performers", "deadline", "status",
             "planned_intensity", "actual_completion_time"],
     extra=1,
-    form=SubTaskForm
+    form=SubTaskForm,
+    can_delete=True
 )
 
 
 class TaskEditForm(TaskForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     planned_intensity = forms.IntegerField(
         label="Планируемая интенсивность задачи",
         disabled=True
@@ -92,6 +86,9 @@ class TaskEditForm(TaskForm):
         label="Фактическое время выполнения",
         disabled=True
     )
+
+    class Meta(TaskForm.Meta):
+        pass
 
 
 class SubTaskEditForm(TaskEditForm):
