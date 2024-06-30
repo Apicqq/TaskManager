@@ -27,7 +27,7 @@
               <p>Фактическое время выполнения (в
                 часах): {{ object.actual_completion_time }}</p>
             </div>
-            {% if object.subtasks %}
+            {% if object.subtasks.exists %}
               <div class="card-body">
                 <h3>Подзадачи:</h3>
                 <div class="row">
@@ -44,7 +44,7 @@
                           <p class="card-text">Назначенные
                             лица: {{ subtask.performers }}</p>
                           <p class="card-text">Планируемая интенсивность
-                          задачи: {{ subtask.planned_intensity }}</p>
+                            задачи: {{ subtask.planned_intensity }}</p>
                           <p class="card-text">Фактическое время выполнения (в
                             часах): {{ subtask.actual_completion_time }}</p>
                           <a href="{% url 'subtask_detail' object.id subtask.id %}"
@@ -54,6 +54,11 @@
                     </div>
                   {% endfor %}
                 </div>
+              </div>
+            {% elif "subtask" in path %}
+            {% else %}
+              <div class="card-body">
+                <h3>У данной задачи подзадач нет</h3>
               </div>
             {% endif %}
             {% if "subtask" in path %}
@@ -106,7 +111,7 @@
           if (!confirm("Вы точно хотите удалить эту подзадачу?")) {
               e.preventDefault();
           } else {
-              $("subtask-delete").submit();
+              $("#subtask-delete").submit();
           }
       }
   </script>
