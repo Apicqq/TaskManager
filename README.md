@@ -30,7 +30,7 @@ git clone https://github.com/Apicqq/TaskManager
 cd <путь_до_папки_с_проектом>/TaskManager
 ```
 
-Установить зависимости из файла requirements.txt:
+Установить зависимости проекта:
 
 * Если у вас установлен Poetry:
     ```
