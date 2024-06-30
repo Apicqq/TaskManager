@@ -102,7 +102,7 @@ TaskUpdateFormSet = forms.inlineformset_factory(
         "actual_completion_time",
     ],
     extra=Values.FORMSETS_EXTRA_FORMS,
-    form=SubTaskForm,
+    form=TaskForm,
     can_delete=True,
 )
 
