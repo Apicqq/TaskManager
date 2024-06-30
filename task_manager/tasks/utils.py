@@ -1,11 +1,13 @@
 """Вспомогательные функции, помогающие реализовать бизнес-логику проекта."""
+from typing import Union
 
 from django.db.models import Sum
 
 from core.constants import Literals
+from tasks.models import TaskModel, SubTask
 
 
-def can_set_status_to_completed(task):
+def can_set_status_to_completed(task: Union[TaskModel, SubTask]) -> bool:
     """
     Проверка возможности установки статуса "Завершена" для задачи.
     """
@@ -24,7 +26,7 @@ def can_set_status_to_completed(task):
         return False
 
 
-def calculate_task_values(instance):
+def calculate_task_values(instance: TaskModel) -> None:
     """
     Функция, использующаяся для пересчёта значений полей
     "Плановая трудоёмкость задачи" и "Фактическое время выполнения"
