@@ -1,5 +1,6 @@
 from django import forms
 
+from core.constants import Errors, Literals, Values
 from tasks.models import SubTask, TaskModel
 from tasks.utils import can_set_status_to_completed
 
@@ -31,22 +32,26 @@ class TaskForm(forms.ModelForm):
                 self.initial["status"],
                 self.cleaned_data["status"],
             )
-            if initial_status != "In progress" and new_status == "Completed":
-                raise forms.ValidationError(
-                    'Задача может быть переведена в статус "Завершена" '
-                    "только после её принятия в работу"
-                )
-            elif new_status == "Paused" and initial_status != "In progress":
-                raise forms.ValidationError(
-                    'Задача может быть переведена в статус "Приостановлена" '
-                    "только после её принятия в работу"
-                )
-            elif new_status == "Completed" and not can_set_status_to_completed(
-                self.instance
+            if (
+                    initial_status != Literals.IN_PROGRESS_INTERNAL
+                    and new_status == Literals.COMPLETED_INTERNAL
             ):
                 raise forms.ValidationError(
-                    'Задача может быть переведена в статус "Завершена" '
-                    "только после того, как все подзадачи будут выполнены."
+                    Errors.TASK_CANNOT_BE_COMPLETED_UNTIL_IN_PROGRESS
+                )
+            elif (
+                    new_status == Literals.PAUSED_INTERNAL
+                    and initial_status != Literals.IN_PROGRESS_INTERNAL
+            ):
+                raise forms.ValidationError(
+                    Errors.TASK_CANNOT_BE_PAUSED_UNTIL_IN_PROGRESS
+                )
+            elif (
+                    new_status == Literals.COMPLETED_INTERNAL
+                    and not can_set_status_to_completed(self.instance)
+            ):
+                raise forms.ValidationError(
+                    Errors.TASK_CANNOT_BE_COMPLETED_UNTIL_ALL_SUBTASKS_ARE_DONE
                 )
         return self.cleaned_data["status"]
 
@@ -79,7 +84,7 @@ TaskCreateFormSet = forms.modelformset_factory(
         "planned_intensity",
         "actual_completion_time",
     ],
-    extra=1,
+    extra=Values.FORMSETS_EXTRA_FORMS,
     can_delete=False,
     form=TaskForm,
 )
@@ -96,7 +101,7 @@ TaskUpdateFormSet = forms.inlineformset_factory(
         "planned_intensity",
         "actual_completion_time",
     ],
-    extra=1,
+    extra=Values.FORMSETS_EXTRA_FORMS,
     form=SubTaskForm,
     can_delete=True,
 )
@@ -104,10 +109,10 @@ TaskUpdateFormSet = forms.inlineformset_factory(
 
 class TaskEditForm(TaskForm):
     planned_intensity = forms.IntegerField(
-        label="Планируемая интенсивность задачи", disabled=True
+        label=Literals.PLANNED_INTENSITY, disabled=True
     )
     actual_completion_time = forms.IntegerField(
-        label="Фактическое время выполнения", disabled=True
+        label=Literals.ACTUAL_COMPLETION_TIME, disabled=True
     )
 
     class Meta(TaskForm.Meta):
