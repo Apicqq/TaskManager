@@ -1,9 +1,10 @@
 from django.urls import path
 
 from tasks.views import (
-    TaskListView, TaskDetailView, TaskCreateView, TaskDeleteView, SubTaskDetailView,
+    TaskListView, TaskDetailView, TaskCreateView, TaskDeleteView,
+    SubTaskDetailView,
     TaskUpdateView, SubTaskCreateView, SubTaskDeleteView, SubTaskUpdateView,
-add_task
+    task_detail
 )
 
 urlpatterns = [
@@ -18,39 +19,41 @@ urlpatterns = [
         name="create_task"
     ),
     path(
-        "<int:task_id>/",
+        "tasks/<int:task_id>/",
         TaskDetailView.as_view(),
         name="task_detail"
     ),
     path(
-        "<int:task_id>/delete/",
+        "tasks/<int:task_id>/delete_task/",
         TaskDeleteView.as_view(),
         name="delete_task"
     ),
     path(
-        "<int:task_id>/update_task/",
+        "tasks/<int:task_id>/update_task/",
         TaskUpdateView.as_view(),
         name="update_task"
     ),
     path(
-        "<int:task_id>/create_subtask/",
+        "tasks/<int:task_id>/create_subtask/",
         SubTaskCreateView.as_view(),
         name="create_subtask"
     ),
     path(
-        "<int:task_id>/subtasks/<int:subtask_id>/",
+        "tasks/<int:task_id>/subtasks/<int:subtask_id>/",
         SubTaskDetailView.as_view(),
         name="subtask_detail"
     ),
     path(
-        "<int:task_id>/subtasks/<int:subtask_id>/update/",
+        "tasks/<int:task_id>/subtasks/<int:subtask_id>/update/",
         SubTaskUpdateView.as_view(),
         name="update_subtask"
     ),
     path(
-        "<int:task_id>/subtasks/<int:subtask_id>/delete/",
+        "tasks/<int:task_id>/subtasks/<int:subtask_id>/delete_subtask/",
         SubTaskDeleteView.as_view(),
         name="delete_subtask"
     ),
-    path("add_subtask/", add_task, name="add_subtask"),
+    path(
+        r'ajax/task_data/', task_detail, name='task_data'
+    )
 ]

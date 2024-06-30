@@ -1,5 +1,5 @@
 from django.db.transaction import atomic
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     ListView,
@@ -135,3 +135,8 @@ class SubTaskDetailView(SubTaskMixin, DetailView):
             **context,
             form=SubTaskForm,
         )
+
+
+def task_detail(request, task_id):
+    task = TaskModel.objects.get(task_id)
+    return render(request, "tasks/detail.html", dict(task=task))
