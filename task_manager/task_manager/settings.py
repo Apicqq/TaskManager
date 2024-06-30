@@ -52,7 +52,6 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = "task_manager.wsgi.application"
 
 DATABASES = {
@@ -61,7 +60,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
