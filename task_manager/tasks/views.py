@@ -117,10 +117,6 @@ class TaskUpdateView(TaskMixin, UpdateView):
         return reverse("task_detail", kwargs={"task_id": self.object.pk})
 
 
-class SubTaskCreateView(SubTaskMixin, CreateView):
-    form_class = TaskCreateFormSet
-
-
 class SubTaskDeleteView(SubTaskMixin, DeleteView):
     success_url = reverse_lazy("task_list")
 
