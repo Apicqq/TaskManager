@@ -7,7 +7,6 @@ from tasks.views import (
     TaskDeleteView,
     SubTaskDetailView,
     TaskUpdateView,
-    # SubTaskCreateView,
     SubTaskDeleteView,
     SubTaskUpdateView,
     task_detail, subtask_detail,
