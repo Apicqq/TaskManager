@@ -23,14 +23,29 @@ from tasks.utils import calculate_task_values
 
 
 class TaskListView(TaskMixin, ListView):
+    """
+    Контроллер для отображения списка задач.
+
+    В текущей реализации выводит пустую страницу, навигация осуществляется
+    через сайдбар в левой части экрана.
+    """
+
     template_name = "tasks/tasks_list.html"
 
 
 class TaskDetailView(TaskMixin, DetailView):
+    """
+    Контроллер для отображения информации о конкретной задаче.
+    """
+
     template_name = "tasks/detail.html"
 
 
 class TaskCreateView(TaskMixin, CreateView):
+    """
+    Контроллер, использующийся для создания нового объекта задачи.
+    """
+
     form_class = TaskForm
     template_name = "tasks/create_task.html"
     success_url = reverse_lazy("task_list")
@@ -39,6 +54,11 @@ class TaskCreateView(TaskMixin, CreateView):
         return reverse("task_detail", kwargs={"task_id": self.object.pk})
 
     def get_context_data(self, **kwargs):
+        """
+        Метод для добавления данных в контекст веб-страницы.
+        В данном случае помимо основного контекста передаём формсет,
+        при помощи которого к задаче можно добавить подзадачи.
+        """
         context = super().get_context_data(**kwargs)
         return dict(
             **context,
@@ -47,6 +67,16 @@ class TaskCreateView(TaskMixin, CreateView):
 
     @atomic
     def post(self, request, *args, **kwargs):
+        """
+        Переопределенный метод для отправки POST-запроса и создания нового
+        объекта задачи.
+
+        К стандартной реализации добавлены проверки валидности формы и
+        формсета, а также реализация бизнес-логики проекта. Помимо этого,
+        к методу добавлен декоратор atomic, который гарантирует что транзакция
+        и создание объекта будет осуществлено либо полностью, либо не будет
+        осуществлено вообще.
+        """
         self.object = None
         form = self.get_form()
         formset = TaskCreateFormSet(
@@ -71,10 +101,22 @@ class TaskCreateView(TaskMixin, CreateView):
 
 
 class TaskDeleteView(TaskMixin, DeleteView):
+    """
+    Эндпоинт-заглушка для удаления объекта задачи.
+
+    Удаление задач происходит при помощи скрипта, поэтому данный эндпоинт
+    нужен только для реализации его логики, в связи с этим шаблон для него
+    отсутствует.
+    """
+
     success_url = reverse_lazy("task_list")
 
 
 class TaskUpdateView(TaskMixin, UpdateView):
+    """
+    Контроллер, использующийся для редактирования существующего объекта задачи.
+    """
+
     template_name = "tasks/update.html"
     form_class = TaskEditForm
 
@@ -82,6 +124,11 @@ class TaskUpdateView(TaskMixin, UpdateView):
         return get_object_or_404(TaskModel, pk=self.kwargs["task_id"])
 
     def get_context_data(self, **kwargs):
+        """
+        Метод для добавления данных в контекст веб-страницы.
+        В данном случае помимо основного контекста передаём формсет,
+        при помощи которого к задаче можно добавить и/или удалить подзадачи.
+        """
         context = super().get_context_data(**kwargs)
         return dict(
             **context,
@@ -92,6 +139,16 @@ class TaskUpdateView(TaskMixin, UpdateView):
 
     @atomic
     def post(self, request, *args, **kwargs):
+        """
+        Переопределенный метод для отправки POST-запроса и создания нового
+        объекта задачи.
+
+        К стандартной реализации добавлены проверки валидности формы и
+        формсета, а также реализация бизнес-логики проекта. Помимо этого,
+        к методу добавлен декоратор atomic, который гарантирует что транзакция
+        и создание объекта будет осуществлено либо полностью, либо не будет
+        осуществлено вообще.
+        """
         self.object = self.get_object()
         form = self.get_form()
         formset = TaskUpdateFormSet(
@@ -118,10 +175,23 @@ class TaskUpdateView(TaskMixin, UpdateView):
 
 
 class SubTaskDeleteView(SubTaskMixin, DeleteView):
+    """
+    Эндпоинт-заглушка для удаления объекта подзадачи.
+
+    Удаление подзадач происходит при помощи скрипта, поэтому данный эндпоинт
+    нужен только для реализации его логики, в связи с этим шаблон для него
+    отсутствует.
+    """
+
     success_url = reverse_lazy("task_list")
 
 
 class SubTaskUpdateView(SubTaskMixin, UpdateView):
+    """
+    Контроллер, использующийся для прямого редактирования
+    существующего объекта подзадачи.
+    """
+
     template_name = "tasks/update.html"
     form_class = SubTaskEditForm
 
@@ -135,6 +205,11 @@ class SubTaskUpdateView(SubTaskMixin, UpdateView):
 
 
 class SubTaskDetailView(SubTaskMixin, DetailView):
+    """
+    Контроллер, использующийся для просмотра данных о
+    существующем объекте подзадачи.
+    """
+
     template_name = "tasks/detail.html"
 
     def get_context_data(self, **kwargs):
@@ -146,12 +221,20 @@ class SubTaskDetailView(SubTaskMixin, DetailView):
 
 
 def task_detail(request, task_id):
-    task = TaskModel.objects.get(task_id)
-    return render(request, "tasks/detail.html", dict(task=task))
+    """
+    Эндпоинт, использующийся для передачи данных в AJAX-script для
+    бесшовной навигации между задачами.
+    """
+    return render(request, "tasks/detail.html", dict(
+        task=TaskModel.objects.get(task_id)
+    ))
 
 
 def subtask_detail(request, subtask_id):
-    subtask = SubTask.objects.get(subtask_id)
+    """
+    Эндпоинт, использующийся для передачи данных в AJAX-script для
+    бесшовной навигации между задачами.
+    """
     return render(request, "tasks/detail.html", dict(
-        subtask=subtask
+        subtask=SubTask.objects.get(subtask_id)
     ))

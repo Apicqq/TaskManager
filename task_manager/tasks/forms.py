@@ -6,6 +6,13 @@ from tasks.utils import can_set_status_to_completed
 
 
 class SubTaskForm(forms.ModelForm):
+    """
+    Форма для создания/редактирования объектов модели SubTask.
+
+    Здесь переопределяем виджет для поля deadline, чтобы он отображал
+    только дату.
+    """
+
     class Meta:
         model = SubTask
         fields = [
@@ -25,8 +32,22 @@ class SubTaskForm(forms.ModelForm):
 
 
 class TaskForm(forms.ModelForm):
+    """
+    Форма для создания объектов модели TaskModel.
+
+    Здесь переопределяем виджет для поля deadline, чтобы он отображал
+    только дату.
+    """
 
     def clean_status(self):
+        """
+        Метод для проверки валидности поля status у модели TaskModel.
+
+        Проверяется, что задача:
+        1. Может быть завершена только после её принятия в работу;
+        2. Может быть поставлена на паузу только после её принятия в работу;
+        3. Может быть завершена, если все её подзадачи могут быть завершены.
+        """
         if self.initial.get("status") is not None:
             initial_status, new_status = (
                 self.initial["status"],
@@ -108,6 +129,13 @@ TaskUpdateFormSet = forms.inlineformset_factory(
 
 
 class TaskEditForm(TaskForm):
+    """
+    Форма для редактирования объектов модели TaskModel.
+
+    Здесь переопределяем поля planned_intensity и actual_completion_time,
+    чтобы сделать их недоступными для редактирования.
+    """
+
     planned_intensity = forms.IntegerField(
         label=Literals.PLANNED_INTENSITY, disabled=True
     )
@@ -120,4 +148,7 @@ class TaskEditForm(TaskForm):
 
 
 class SubTaskEditForm(TaskEditForm):
-    pass
+    """
+    Форма для редактирования объектов модели SubTask.
+    """
+

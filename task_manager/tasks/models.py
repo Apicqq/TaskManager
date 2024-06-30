@@ -6,7 +6,12 @@ from core.models import TaskSubtaskBaseModel
 
 
 class TaskModel(TaskSubtaskBaseModel):
-    """Модель задачи."""
+    """
+    Модель задачи.
+
+    Такое название (а не Task) выбрано намеренно, чтобы избежать конфликта
+    с классом Task из модуля asyncio.
+    """
 
     name = models.CharField(
         max_length=Values.NAME_MAX_LENGTH,
@@ -21,6 +26,12 @@ class TaskModel(TaskSubtaskBaseModel):
         return f"{self.name}: {self.description}"
 
     def save(self, *args, **kwargs):
+        """
+        Метод сохранения объекта модели TaskModel.
+
+        Переопределяем логику для того, чтобы также переводить в статус
+        "Завершена" подзадачи конкретной задачи.
+        """
         if self.status == Literals.COMPLETED_INTERNAL:
             self.actual_completion_time = Now()
             for subtask in self.subtasks.all():

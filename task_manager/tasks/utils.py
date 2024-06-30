@@ -1,9 +1,14 @@
+"""Вспомогательные функции, помогающие реализовать бизнес-логику проекта."""
+
 from django.db.models import Sum
 
 from core.constants import Literals
 
 
 def can_set_status_to_completed(task):
+    """
+    Проверка возможности установки статуса "Завершена" для задачи.
+    """
     if task.status == Literals.COMPLETED_INTERNAL:
         return True
     elif task.status == Literals.IN_PROGRESS_INTERNAL:
@@ -20,6 +25,11 @@ def can_set_status_to_completed(task):
 
 
 def calculate_task_values(instance):
+    """
+    Функция, использующаяся для пересчёта значений полей
+    "Плановая трудоёмкость задачи" и "Фактическое время выполнения"
+    после удаления/добавления подзадач к задаче.
+    """
     if instance.subtasks.exists():
         subtask_sums = instance.subtasks.aggregate(
             planned_intensity=Sum("planned_intensity"),

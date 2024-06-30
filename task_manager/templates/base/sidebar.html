@@ -1,7 +1,6 @@
 {% load _filter %}
 {% load sidebar_querysets %}
 {% load cache %}
-{#{% cache 500 sidebar %}#}
 {% sidebar_querysets as qs %}
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
     id="accordionSidebar">
@@ -53,4 +52,3 @@
     </li>
   {% endfor %}
 </ul>
-{#{% endcache sidebar %}#}
