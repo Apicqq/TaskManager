@@ -152,3 +152,10 @@ class SubTaskDetailView(SubTaskMixin, DetailView):
 def task_detail(request, task_id):
     task = TaskModel.objects.get(task_id)
     return render(request, "tasks/detail.html", dict(task=task))
+
+
+def subtask_detail(request, subtask_id):
+    subtask = SubTask.objects.get(subtask_id)
+    return render(request, "tasks/detail.html", dict(
+        subtask=subtask
+    ))

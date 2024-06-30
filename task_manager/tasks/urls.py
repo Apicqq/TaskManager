@@ -10,7 +10,7 @@ from tasks.views import (
     SubTaskCreateView,
     SubTaskDeleteView,
     SubTaskUpdateView,
-    task_detail,
+    task_detail, subtask_detail,
 )
 
 urlpatterns = [
@@ -48,4 +48,5 @@ urlpatterns = [
         name="delete_subtask",
     ),
     path(r"ajax/task_data/", task_detail, name="task_data"),
+    path(r"ajax/subtask_data", subtask_detail, name="subtask_data")
 ]

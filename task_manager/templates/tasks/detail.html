@@ -21,7 +21,7 @@
               <p>Планируемая дата выполнения: {{ object.deadline|date }}</p>
               <p>Назначенные лица: {{ object.performers }}</p>
               <p>Задача создана: {{ object.created_at|date }}</p>
-              <p>Статус задачи: {{ object.status }}</p>
+              <p>Статус задачи: {{ object.get_status_display }}</p>
               <p>Планируемая интенсивность
                 задачи: {{ object.planned_intensity }}</p>
               <p>Фактическое время выполнения (в
@@ -38,7 +38,7 @@
                           <h5 class="card-title">{{ subtask.name }}</h5>
                           <p class="card-text">{{ subtask.description }}</p>
                           <p class="card-text">Статус
-                            подзадачи: {{ subtask.status }}</p>
+                            подзадачи: {{ subtask.get_status_display }}</p>
                           <p class="card-text">Планируемая дата
                             выполнения: {{ subtask.deadline|date }}</p>
                           <p class="card-text">Назначенные
