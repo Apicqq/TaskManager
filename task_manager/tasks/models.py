@@ -42,7 +42,7 @@ class SubTask(TaskSubtaskBaseModel):
         verbose_name="Задача",
         on_delete=models.SET_NULL,
         related_name="subtasks",
-        null=True
+        null=True,
     )
 
     class Meta:

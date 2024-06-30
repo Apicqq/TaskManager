@@ -20,5 +20,58 @@
 </div>
 {% include "base/javascripts.html" %}
 {% block scripts %}{% endblock %}
+{#<script>#}
+{#    $(document).ready(function() {#}
+{#        $(".collapse-item").click(function (e) {#}
+{#            e.preventDefault(); // Prevent the default link behavior#}
+{#            const href = $(this).attr('href'); // Get the href attribute of the clicked link#}
+{#            const regex = /\/(\d+)\/subtasks\/(\d+)\//;#}
+{#            const match = href.match(regex);#}
+{##}
+{#            if (match) {#}
+{#                let taskId = match[1];#}
+{#                let subtaskId = match[2];#}
+{#                console.log(taskId);#}
+{#                console.log(subtaskId);#}
+{#                console.log("Test");#}
+{#                $.ajax({#}
+{#                    url: '{% url "subtask_detail" task_id subtask_id %}', // Replace with the correct URL once taskId and subtaskId are obtained#}
+{#                    data: {#}
+{#                        'task_id': taskId,#}
+{#                        "subtask_id": subtaskId#}
+{#                    },#}
+{#                    dataType: 'json',#}
+{#                    success: function (data) {#}
+{#                        document.getElementById('wrapper').getElementsByClassName('container-fluid')[0].innerHTML = "Hello, world!";#}
+{#                        console.log("success")#}
+{#                    },#}
+{#                    error: function (error) {#}
+{#                        console.log("something went wrong")#}
+{#                    }#}
+{#                });#}
+{#            }#}
+{#        });#}
+{#    });#}
+{#</script>#}
+<script>
+  $(document).ready(function() {
+    $('a[id^="task-id-"]').click(function(event) {
+        event.preventDefault();
+        const href = $(this).attr('href'); // Get the href attribute of the clicked link
+            const regex = /\/(\d+)\//;
+            const match = href.match(regex);
+        let task_id = match[1]
+        console.log(task_id)
+        $.ajax({
+            type: 'GET',
+            url: '{% url "task_detail" 0 %}'.replace('0', task_id),
+            success: function(data) {
+                let html = $(data).find('.container').html()
+                $('.container').html(html);
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

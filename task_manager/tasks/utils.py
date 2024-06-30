@@ -6,9 +6,8 @@ def can_set_status_to_completed(task):
         return True
     elif task.status == "In progress":
         return all(
-            can_set_status_to_completed(
-                subtask
-            ) for subtask in task.subtasks.all()
+            can_set_status_to_completed(subtask)
+            for subtask in task.subtasks.all()
         )
     else:
         return False
@@ -26,12 +25,11 @@ def calculate_task_values(instance):
             actual_completion_time=Sum("actual_completion_time"),
         )
         instance.planned_intensity = (
-                subtask_sums['planned_intensity']
-                + instance.planned_intensity
+            subtask_sums["planned_intensity"] + instance.planned_intensity
         )
         instance.actual_completion_time = (
-                subtask_sums['actual_completion_time']
-                + instance.actual_completion_time
+            subtask_sums["actual_completion_time"]
+            + instance.actual_completion_time
         )
         instance.save()
     else:

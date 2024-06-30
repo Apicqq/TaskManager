@@ -6,11 +6,17 @@ from django.views.generic import (
     DetailView,
     CreateView,
     DeleteView,
-    UpdateView
+    UpdateView,
 )
 
-from tasks.forms import TaskForm, TaskCreateFormSet, SubTaskForm, TaskEditForm, \
-    SubTaskEditForm, TaskUpdateFormSet
+from tasks.forms import (
+    TaskForm,
+    TaskCreateFormSet,
+    SubTaskForm,
+    TaskEditForm,
+    SubTaskEditForm,
+    TaskUpdateFormSet,
+)
 from tasks.mixins import TaskMixin, SubTaskMixin
 from tasks.models import SubTask, TaskModel
 from tasks.utils import calculate_task_values
@@ -43,7 +49,9 @@ class TaskCreateView(TaskMixin, CreateView):
     def post(self, request, *args, **kwargs):
         self.object = None
         form = self.get_form()
-        formset = TaskCreateFormSet(request.POST, form_kwargs={"empty_permitted": False})
+        formset = TaskCreateFormSet(
+            request.POST, form_kwargs={"empty_permitted": False}
+        )
         if form.is_valid():
             instance = form.save(commit=False)
             if formset.is_valid():
@@ -55,7 +63,9 @@ class TaskCreateView(TaskMixin, CreateView):
                 calculate_task_values(instance)
                 return redirect(self.success_url)
             else:
-                return self.render_to_response(dict(form=form, formset=formset))
+                return self.render_to_response(
+                    dict(form=form, formset=formset)
+                )
         else:
             return self.render_to_response(dict(form=form, formset=formset))
 
@@ -87,7 +97,7 @@ class TaskUpdateView(TaskMixin, UpdateView):
         formset = TaskUpdateFormSet(
             request.POST,
             instance=self.object,
-            form_kwargs={"empty_permitted": False}
+            form_kwargs={"empty_permitted": False},
         )
         if form.is_valid():
             task = form.save(commit=False)
@@ -97,7 +107,9 @@ class TaskUpdateView(TaskMixin, UpdateView):
                 calculate_task_values(self.object)
                 return redirect(self.get_success_url())
             else:
-                return self.render_to_response(dict(form=form, formset=formset))
+                return self.render_to_response(
+                    dict(form=form, formset=formset)
+                )
         else:
             return self.render_to_response(dict(form=form, formset=formset))
 
@@ -119,10 +131,10 @@ class SubTaskUpdateView(SubTaskMixin, UpdateView):
 
     def get_success_url(self):
         return reverse(
-            "subtask_detail", kwargs=dict(
-                task_id=self.object.task.pk,
-                subtask_id=self.object.pk
-            )
+            "subtask_detail",
+            kwargs=dict(
+                task_id=self.object.task.pk, subtask_id=self.object.pk
+            ),
         )
 
 

@@ -12,7 +12,7 @@ def task_data():
         status="Assigned",
         deadline="2024-05-30",
         planned_intensity=3,
-        actual_completion_time=3
+        actual_completion_time=3,
     )
     return task
 
@@ -26,7 +26,7 @@ def subtask_data():
         status="Assigned",
         deadline="2024-05-30",
         planned_intensity=3,
-        actual_completion_time=3
+        actual_completion_time=3,
     )
     return subtask
 
@@ -46,7 +46,7 @@ def subtask_form_data():
         "subtasks-0-planned_intensity": "3",
         "subtasks-0-actual_completion_time": "3",
         "subtasks-0-id": "",
-        "subtasks-0-task": ""
+        "subtasks-0-task": "",
     }
     return subtask
 
@@ -80,7 +80,7 @@ def subtask_form_update_data():
         "subtasks-1-planned_intensity": "",
         "subtasks-1-actual_completion_time": "",
         "subtasks-1-id": 1,
-        "subtasks-1-task": 1
+        "subtasks-1-task": 1,
     }
     return subtask
 
@@ -95,6 +95,7 @@ def created_task(task_data):
 def created_subtask(subtask_data):
     subtask = SubTask.objects.create(**subtask_data, task_id=1)
     return subtask
+
 
 @pytest.fixture
 def task_in_progress(created_task):
