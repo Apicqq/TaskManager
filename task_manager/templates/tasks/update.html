@@ -6,9 +6,11 @@
   <div class="col d-flex justify-content-center">
     <div class="card" style="width: 40rem; height: max-content;">
       {% if "subtask" in request.path %}
-        <div class="card-header">Редактирование подзадачи: <b>{{ object.name|safe }}</b></div>
+        <div class="card-header">Редактирование подзадачи:
+          <b>{{ object.name|safe }}</b></div>
       {% else %}
-      <div class="card-header">Редактирование задачи: <b>{{ object.name|safe }}</b></div>
+        <div class="card-header">Редактирование задачи:
+          <b>{{ object.name|safe }}</b></div>
       {% endif %}
       <div class="card-body">
         <form method="post" enctype="multipart/form-data"
@@ -19,7 +21,6 @@
             </div>
           <br>
           {% for formset_form in formset.forms %}
-            {{ formset.management_form }}
             <div class="subtask-form">
               {% bootstrap_form formset_form %}
             </div>
@@ -28,6 +29,7 @@
           <div id="button-container">
             {% bootstrap_button button_type="submit" content="Отправить" %}
           </div>
+          {{ formset.management_form }}
         </form>
       </div>
     </div>
@@ -38,7 +40,7 @@
   <script type="text/javascript">
       $(function () {
           $('.subtask-form').formset({
-              prefix: '{{ formset.prefix }}'
+              prefix: '{{ formset_form.prefix }}'
           });
       })
   </script>

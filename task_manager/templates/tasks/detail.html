@@ -10,7 +10,7 @@
         <div class="col-md-8">
           <div class="card">
             <div class="card-header">
-              {% if "subtask" in path %}
+              {% if not object.is_root_task %}
                 <h2>Подзадача: {{ object.name }}</h2>
               {% else %}
                 <h2>Задача: {{ object.name }}</h2>
@@ -47,7 +47,7 @@
                             задачи: {{ subtask.planned_intensity }}</p>
                           <p class="card-text">Фактическое время выполнения (в
                             часах): {{ subtask.actual_completion_time }}</p>
-                          <a href="{% url 'subtask_detail' object.id subtask.id %}"
+                          <a href="{% url 'task_detail' subtask.id %}"
                              class="btn btn-primary">Открыть подзадачу</a>
                         </div>
                       </div>
@@ -61,21 +61,6 @@
                 <h3>У данной задачи подзадач нет</h3>
               </div>
             {% endif %}
-            {% if "subtask" in path %}
-              <div class="card-footer">
-                <a href="{% url 'update_subtask' object.task.id object.id %}"
-                   class="btn btn-primary">Редактировать подзадачу</a>
-                <form id="subtask-delete" method="post"
-                      action="{% url "delete_subtask" object.task_id subtask.id %}">
-                  {% csrf_token %}
-                  <a href="{% url "delete_subtask" object.task_id subtask.id %}">
-                    <button class="btn btn-danger" onclick="deleteSubtask()">
-                      Удалить подзадачу
-                    </button>
-                  </a>
-                </form>
-              </div>
-            {% else %}
               <div class="card-footer">
                 <a href="{% url 'update_task' object.id %}"
                    class="btn btn-primary">Редактировать задачу</a>
@@ -89,7 +74,6 @@
                   </a>
                 </form>
               </div>
-            {% endif %}
           </div>
         </div>
       </div>
@@ -103,15 +87,6 @@
               e.preventDefault();
           } else {
               $("#task-delete").submit();
-          }
-      }
-  </script>
-  <script>
-      function deleteSubtask(e) {
-          if (!confirm("Вы точно хотите удалить эту подзадачу?")) {
-              e.preventDefault();
-          } else {
-              $("#subtask-delete").submit();
           }
       }
   </script>

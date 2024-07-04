@@ -44,13 +44,12 @@
         $('a[id^="subtask-id-"]').click(function (event) {
             event.preventDefault();
             const href = $(this).attr('href');
-            const regex = /\/(\d+)\/subtasks\/(\d+)\//;
+            const regex = /\/(\d+)\//;
             const match = href.match(regex);
             let task_id = match[1]
-            let subtask_id = match[2]
             $.ajax({
                 type: 'GET',
-                url: '{% url "subtask_detail" 0 0 %}'.replace("0", task_id).replace("0", subtask_id),
+                url: '{% url "task_detail" 0 %}'.replace("0", task_id),
                 success: function (data) {
                     let html = $(data).find('.container').html()
                     $('.container').html(html)

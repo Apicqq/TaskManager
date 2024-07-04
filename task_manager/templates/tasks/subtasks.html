@@ -1,0 +1,10 @@
+{% for subtask in subtasks %}
+    <a href="{% url 'task_detail' subtask.pk %}" class="collapse-item" id="subtask-id-{{ forloop.counter }}">{{ subtask.name|truncatewords:1 }}</a>
+    {% if subtask.subtasks.all %}
+        <button class="btn btn-sm" data-toggle="collapse" style="font-size: 11px" data-target="#subtask-collapse-{{ forloop.counter }}">Показать подзадачи у этой задачи</button>
+        <div id="subtask-collapse-{{ forloop.counter }}" class="collapse">
+            <h6 class="collapse-header">Поздадачи</h6>
+            {% include 'tasks/subtasks.html' with subtasks=subtask.subtasks.all %}
+        </div>
+    {% endif %}
+{% endfor %}

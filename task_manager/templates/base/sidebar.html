@@ -34,15 +34,13 @@
            aria-labelledby="headingTwo"
            data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
-          <a class="collapse-item" id="task-id-{{ forloop.counter }}" href="{% url 'task_detail' task.id %}">Детали
+          <a class="collapse-item" id="task-id-{{ forloop.counter }}"
+             href="{% url 'task_detail' task.id %}">Детали
             задачи</a>
           <h6 class="collapse-header">Поздадачи</h6>
-          {% with qs.subtasks|_filter:task as related_subtasks %}
-            {% if related_subtasks %}
-              {% for subtask in related_subtasks %}
-                <a class="collapse-item" id="subtask-id-{{ forloop.counter }}"
-                   href="{% url 'subtask_detail' task.id subtask.id %}">{{ subtask.name|truncatechars:25 }}</a>
-              {% endfor %}
+          {% with task.subtasks.all as subtasks %}
+            {% if subtasks %}
+              {% include 'tasks/subtasks.html' with subtasks=subtasks %}
             {% else %}
               <div class="collapse-item">Подзадач нет</div>
             {% endif %}
