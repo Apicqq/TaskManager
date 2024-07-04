@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 
-from tasks.models import TaskModel, SubTask
+from tasks.models import TaskModel
 
 
 @pytest.mark.django_db
@@ -13,12 +13,11 @@ def test_task_creation(client, assigned_task_data, subtask_create_form_data):
         )
     )
     assert response.status_code == 302
-    assert TaskModel.objects.count() == 1, (
+    assert TaskModel.objects.count() == 2, (
         "Убедитесь, что задача создаётся корректно."
     )
-    assert SubTask.objects.count() == 1, (
-        "(Убедитесь, что подзадача создаётся корректно."
-    )
+    first_task = TaskModel.objects.get(pk=1)
+    assert TaskModel.objects.get(pk=2).parent_task == first_task
 
 
 @pytest.mark.django_db
@@ -33,7 +32,7 @@ def test_task_detail_view(client, created_task):
 def test_task_update_valid_data(
         client,
         created_task,
-        created_subtask,
+        subtask,
         in_progress_task_data,
         subtask_form_update_data
 ):
@@ -116,7 +115,7 @@ def test_task_cannot_be_paused_until_in_progress(
 
 @pytest.mark.django_db
 def test_task_cannot_be_completed_if_any_tasks_not_completed(
-        client, task_in_progress, created_subtask, completed_task_data
+        client, task_in_progress, completed_task_data, subtask
 ):
     response = client.post(
         reverse("update_task", kwargs={"task_id": 1}),
@@ -142,13 +141,13 @@ def test_task_completes_when_all_subtasks_are_able_to_be_finished(
         task_in_progress,
         subtask_in_progress,
         subtask_form_update_data,
-        completed_task_data
+        completed_task_data,
 ):
     response = client.post(
         reverse("update_task", kwargs={"task_id": 1}),
         data=dict(
             **completed_task_data,
-            **subtask_form_update_data
+            **subtask_form_update_data,
         ),
     )
     assert response.status_code == 302, (
@@ -164,7 +163,7 @@ def test_task_completes_when_all_subtasks_are_able_to_be_finished(
 
 @pytest.mark.django_db
 def test_disabled_fields_cannot_be_changed(
-        client, created_task, created_subtask
+        client, created_task
 ):
     new_planned_intensity = 100
     new_actual_completion_time = 350
@@ -211,21 +210,5 @@ def test_task_deletion(client, created_task):
     )
     assert TaskModel.objects.count() == 0, (
         "Убедитесь, что при отправке DELETE-запроса объект задачи удаляется"
-        "корректно."
-    )
-
-
-@pytest.mark.django_db
-def test_subtask_deletion(client, created_task, created_subtask):
-    response = client.post(reverse("delete_subtask", kwargs={
-        "task_id": 1,
-        "subtask_id": 1
-    }))
-    assert response.status_code == 302, (
-        "Код ответа отличается от ожидаемого. Проверьте корректность "
-        "логики вашего эндпоинта."
-    )
-    assert SubTask.objects.count() == 0, (
-        "Убедитесь, что при отправке DELETE-запроса объект подзадачи удаляется"
         "корректно."
     )
