@@ -12,13 +12,10 @@ from django.views.generic import (
 from tasks.forms import (
     TaskForm,
     TaskCreateFormSet,
-    SubTaskForm,
-    TaskEditForm,
-    SubTaskEditForm,
-    TaskUpdateFormSet,
+    TaskEditForm, TaskUpdateFormSet,
 )
-from tasks.mixins import TaskMixin, SubTaskMixin
-from tasks.models import SubTask, TaskModel
+from tasks.mixins import TaskMixin
+from tasks.models import TaskModel
 from tasks.utils import calculate_task_values
 
 
@@ -62,7 +59,7 @@ class TaskCreateView(TaskMixin, CreateView):
         context = super().get_context_data(**kwargs)
         return dict(
             **context,
-            formset=TaskCreateFormSet(queryset=SubTask.objects.none()),
+            formset=TaskCreateFormSet(queryset=TaskModel.objects.none()),
         )
 
     @atomic
@@ -85,10 +82,11 @@ class TaskCreateView(TaskMixin, CreateView):
         if form.is_valid():
             instance = form.save(commit=False)
             if formset.is_valid():
+                instance.is_root_task = True
                 instance.save()
                 for subtask_form in formset:
                     subtask = subtask_form.save(commit=False)
-                    subtask.task = instance
+                    subtask.parent_task = instance
                     subtask.save()
                 calculate_task_values(instance)
                 return redirect(self.success_url)
@@ -119,6 +117,7 @@ class TaskUpdateView(TaskMixin, UpdateView):
 
     template_name = "tasks/update.html"
     form_class = TaskEditForm
+    success_url = reverse_lazy("task_list")
 
     def get_object(self, queryset=None):
         return get_object_or_404(TaskModel, pk=self.kwargs["task_id"])
@@ -154,15 +153,23 @@ class TaskUpdateView(TaskMixin, UpdateView):
         formset = TaskUpdateFormSet(
             request.POST,
             instance=self.object,
-            form_kwargs={"empty_permitted": False},
         )
         if form.is_valid():
-            task = form.save(commit=False)
+            instance = form.save(commit=False)
             if formset.is_valid():
-                task.save()
-                formset.save()
-                calculate_task_values(self.object)
-                return redirect(self.get_success_url())
+                instance.is_root_task = True
+                instance.save()
+                for subtask_form in formset:
+                    if subtask_form.cleaned_data.get("name") is None:
+                        continue
+                    subtask = subtask_form.save(commit=False)
+                    if subtask_form.cleaned_data.get("DELETE"):
+                        subtask.delete()
+                    else:
+                        subtask.parent_task = instance
+                        subtask.save()
+                calculate_task_values(instance)
+                return redirect(self.success_url)
             else:
                 return self.render_to_response(
                     dict(form=form, formset=formset)
@@ -174,52 +181,6 @@ class TaskUpdateView(TaskMixin, UpdateView):
         return reverse("task_detail", kwargs={"task_id": self.object.pk})
 
 
-class SubTaskDeleteView(SubTaskMixin, DeleteView):
-    """
-    Эндпоинт-заглушка для удаления объекта подзадачи.
-
-    Удаление подзадач происходит при помощи скрипта, поэтому данный эндпоинт
-    нужен только для реализации его логики, в связи с этим шаблон для него
-    отсутствует.
-    """
-
-    success_url = reverse_lazy("task_list")
-
-
-class SubTaskUpdateView(SubTaskMixin, UpdateView):
-    """
-    Контроллер, использующийся для прямого редактирования
-    существующего объекта подзадачи.
-    """
-
-    template_name = "tasks/update.html"
-    form_class = SubTaskEditForm
-
-    def get_success_url(self):
-        return reverse(
-            "subtask_detail",
-            kwargs=dict(
-                task_id=self.object.task.pk, subtask_id=self.object.pk
-            ),
-        )
-
-
-class SubTaskDetailView(SubTaskMixin, DetailView):
-    """
-    Контроллер, использующийся для просмотра данных о
-    существующем объекте подзадачи.
-    """
-
-    template_name = "tasks/detail.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return dict(
-            **context,
-            form=SubTaskForm,
-        )
-
-
 def task_detail(request, task_id):
     """
     Эндпоинт, использующийся для передачи данных в AJAX-script для
@@ -227,14 +188,4 @@ def task_detail(request, task_id):
     """
     return render(request, "tasks/detail.html", dict(
         task=TaskModel.objects.get(task_id)
-    ))
-
-
-def subtask_detail(request, subtask_id):
-    """
-    Эндпоинт, использующийся для передачи данных в AJAX-script для
-    бесшовной навигации между задачами.
-    """
-    return render(request, "tasks/detail.html", dict(
-        subtask=SubTask.objects.get(subtask_id)
     ))

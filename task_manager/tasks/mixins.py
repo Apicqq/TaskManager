@@ -1,4 +1,4 @@
-from tasks.models import TaskModel, SubTask
+from tasks.models import TaskModel
 
 
 class TaskMixin:
@@ -8,11 +8,3 @@ class TaskMixin:
 
     model = TaskModel
     pk_url_kwarg = "task_id"
-
-
-class SubTaskMixin:
-    """
-    Миксин для контроллеров модели SubTask, объединяющий их общие поля.
-    """
-    model = SubTask
-    pk_url_kwarg = "subtask_id"

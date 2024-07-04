@@ -5,11 +5,8 @@ from tasks.views import (
     TaskDetailView,
     TaskCreateView,
     TaskDeleteView,
-    SubTaskDetailView,
     TaskUpdateView,
-    SubTaskDeleteView,
-    SubTaskUpdateView,
-    task_detail, subtask_detail,
+    task_detail,
 )
 
 urlpatterns = [
@@ -26,21 +23,5 @@ urlpatterns = [
         TaskUpdateView.as_view(),
         name="update_task",
     ),
-    path(
-        "tasks/<int:task_id>/subtasks/<int:subtask_id>/",
-        SubTaskDetailView.as_view(),
-        name="subtask_detail",
-    ),
-    path(
-        "tasks/<int:task_id>/subtasks/<int:subtask_id>/update/",
-        SubTaskUpdateView.as_view(),
-        name="update_subtask",
-    ),
-    path(
-        "tasks/<int:task_id>/subtasks/<int:subtask_id>/delete_subtask/",
-        SubTaskDeleteView.as_view(),
-        name="delete_subtask",
-    ),
     path(r"ajax/task_data/", task_detail, name="task_data"),
-    path(r"ajax/subtask_data", subtask_detail, name="subtask_data")
 ]

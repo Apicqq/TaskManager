@@ -1,13 +1,11 @@
 """Вспомогательные функции, помогающие реализовать бизнес-логику проекта."""
-from typing import Union
-
 from django.db.models import Sum
 
 from core.constants import Literals
-from tasks.models import TaskModel, SubTask
+from tasks.models import TaskModel
 
 
-def can_set_status_to_completed(task: Union[TaskModel, SubTask]) -> bool:
+def can_set_status_to_completed(task: TaskModel) -> bool:
     """
     Проверка возможности установки статуса "Завершена" для задачи.
     """

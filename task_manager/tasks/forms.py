@@ -1,34 +1,11 @@
+
+
 from django import forms
+from django.utils import timezone
 
 from core.constants import Errors, Literals, Values
-from tasks.models import SubTask, TaskModel
+from tasks.models import TaskModel
 from tasks.utils import can_set_status_to_completed
-
-
-class SubTaskForm(forms.ModelForm):
-    """
-    Форма для создания/редактирования объектов модели SubTask.
-
-    Здесь переопределяем виджет для поля deadline, чтобы он отображал
-    только дату.
-    """
-
-    class Meta:
-        model = SubTask
-        fields = [
-            "name",
-            "description",
-            "performers",
-            "deadline",
-            "status",
-            "planned_intensity",
-            "actual_completion_time",
-        ]
-        widgets = dict(
-            deadline=forms.DateInput(
-                format="%Y-%m-%d", attrs={"type": "date"}
-            ),
-        )
 
 
 class TaskForm(forms.ModelForm):
@@ -76,6 +53,18 @@ class TaskForm(forms.ModelForm):
                 )
         return self.cleaned_data["status"]
 
+    def clean_deadline(self) -> timezone:
+        """
+        Метод для проверки валидности поля deadline у модели TaskModel.
+
+        Проверяем, что дедлайн у задачи не может быть установлен в прошлом.
+        """
+        if self.cleaned_data["deadline"] < timezone.now():
+            raise forms.ValidationError(
+                Errors.DEADLINE_CANNOT_BE_IN_THE_PAST
+            )
+        return self.cleaned_data["deadline"]
+
     class Meta:
         model = TaskModel
         fields = [
@@ -95,7 +84,7 @@ class TaskForm(forms.ModelForm):
 
 
 TaskCreateFormSet = forms.modelformset_factory(
-    SubTask,
+    TaskModel,
     fields=[
         "name",
         "description",
@@ -108,23 +97,6 @@ TaskCreateFormSet = forms.modelformset_factory(
     extra=Values.FORMSETS_EXTRA_FORMS,
     can_delete=False,
     form=TaskForm,
-)
-
-TaskUpdateFormSet = forms.inlineformset_factory(
-    TaskModel,
-    SubTask,
-    fields=[
-        "name",
-        "description",
-        "performers",
-        "deadline",
-        "status",
-        "planned_intensity",
-        "actual_completion_time",
-    ],
-    extra=Values.FORMSETS_EXTRA_FORMS,
-    form=TaskForm,
-    can_delete=True,
 )
 
 
@@ -147,8 +119,20 @@ class TaskEditForm(TaskForm):
         pass
 
 
-class SubTaskEditForm(TaskEditForm):
-    """
-    Форма для редактирования объектов модели SubTask.
-    """
-
+TaskUpdateFormSet = forms.inlineformset_factory(
+    TaskModel,
+    TaskModel,
+    fields=[
+        "name",
+        "description",
+        "performers",
+        "deadline",
+        "status",
+        "planned_intensity",
+        "actual_completion_time",
+    ],
+    extra=Values.FORMSETS_EXTRA_FORMS,
+    form=TaskForm,
+    can_delete=True,
+    fk_name="parent_task",
+)

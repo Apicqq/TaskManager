@@ -17,6 +17,9 @@ class Errors(StrEnum):
         "только после того, как все подзадачи будут выполнены."
 
     )
+    DEADLINE_CANNOT_BE_IN_THE_PAST = (
+        "Дедлайн не может быть установлен в прошлом."
+    )
 
 
 class Values(IntEnum):
