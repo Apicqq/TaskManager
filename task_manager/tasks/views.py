@@ -12,7 +12,8 @@ from django.views.generic import (
 from tasks.forms import (
     TaskForm,
     TaskCreateFormSet,
-    TaskEditForm, TaskUpdateFormSet,
+    TaskEditForm,
+    TaskUpdateFormSet,
 )
 from tasks.mixins import TaskMixin
 from tasks.models import TaskModel
@@ -160,7 +161,13 @@ class TaskUpdateView(TaskMixin, UpdateView):
                 instance.is_root_task = True
                 instance.save()
                 for subtask_form in formset:
-                    if subtask_form.cleaned_data.get("name") is None:
+                    if any(
+                        subtask_form.cleaned_data.get(field) is None
+                        for field in subtask_form
+                        if field != ["DELETE", "parent_task", "id"]
+                    ):
+                        # Пропускаем пустые формы, созданные формсетом,
+                        # чтобы не словить ошибку
                         continue
                     subtask = subtask_form.save(commit=False)
                     if subtask_form.cleaned_data.get("DELETE"):
@@ -186,6 +193,6 @@ def task_detail(request, task_id):
     Эндпоинт, использующийся для передачи данных в AJAX-script для
     бесшовной навигации между задачами.
     """
-    return render(request, "tasks/detail.html", dict(
-        task=TaskModel.objects.get(task_id)
-    ))
+    return render(
+        request, "tasks/detail.html", dict(task=TaskModel.objects.get(task_id))
+    )

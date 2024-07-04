@@ -7,6 +7,7 @@ class SubTaskInline(admin.TabularInline):
     """
     Базовый инлайн для подзадач.
     """
+
     model = TaskModel
     can_delete = False
     extra = 0
@@ -16,4 +17,5 @@ class SubTaskInline(admin.TabularInline):
 @admin.register(TaskModel)
 class TaskAdmin(admin.ModelAdmin):
     """Базовая админ-панель для задач."""
+
     inlines = [SubTaskInline]

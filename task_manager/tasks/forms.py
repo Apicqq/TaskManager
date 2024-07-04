@@ -1,5 +1,3 @@
-
-
 from django import forms
 from django.utils import timezone
 
@@ -31,22 +29,22 @@ class TaskForm(forms.ModelForm):
                 self.cleaned_data["status"],
             )
             if (
-                    initial_status != Literals.IN_PROGRESS_INTERNAL
-                    and new_status == Literals.COMPLETED_INTERNAL
+                initial_status != Literals.IN_PROGRESS_INTERNAL
+                and new_status == Literals.COMPLETED_INTERNAL
             ):
                 raise forms.ValidationError(
                     Errors.TASK_CANNOT_BE_COMPLETED_UNTIL_IN_PROGRESS
                 )
             elif (
-                    new_status == Literals.PAUSED_INTERNAL
-                    and initial_status != Literals.IN_PROGRESS_INTERNAL
+                new_status == Literals.PAUSED_INTERNAL
+                and initial_status != Literals.IN_PROGRESS_INTERNAL
             ):
                 raise forms.ValidationError(
                     Errors.TASK_CANNOT_BE_PAUSED_UNTIL_IN_PROGRESS
                 )
             elif (
-                    new_status == Literals.COMPLETED_INTERNAL
-                    and not can_set_status_to_completed(self.instance)
+                new_status == Literals.COMPLETED_INTERNAL
+                and not can_set_status_to_completed(self.instance)
             ):
                 raise forms.ValidationError(
                     Errors.TASK_CANNOT_BE_COMPLETED_UNTIL_ALL_SUBTASKS_ARE_DONE
@@ -60,9 +58,7 @@ class TaskForm(forms.ModelForm):
         Проверяем, что дедлайн у задачи не может быть установлен в прошлом.
         """
         if self.cleaned_data["deadline"] < timezone.now():
-            raise forms.ValidationError(
-                Errors.DEADLINE_CANNOT_BE_IN_THE_PAST
-            )
+            raise forms.ValidationError(Errors.DEADLINE_CANNOT_BE_IN_THE_PAST)
         return self.cleaned_data["deadline"]
 
     class Meta:

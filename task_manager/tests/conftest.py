@@ -74,7 +74,7 @@ def subtask_create_form_data():
         "form-0-deadline": timezone.now() + timezone.timedelta(days=1),
         "form-0-planned_intensity": "3",
         "form-0-actual_completion_time": "3",
-        "form-0-id": ""
+        "form-0-id": "",
     }
     return subtask
 
@@ -118,9 +118,7 @@ def created_task(assigned_task_data):
 
 @pytest.fixture
 def task_in_progress(in_progress_task_data):
-    return TaskModel.objects.create(
-        **in_progress_task_data
-    )
+    return TaskModel.objects.create(**in_progress_task_data)
 
 
 @pytest.fixture
@@ -133,7 +131,7 @@ def subtask(task_in_progress):
         deadline=timezone.now() + timezone.timedelta(days=1),
         planned_intensity=3,
         actual_completion_time=3,
-        parent_task=task_in_progress
+        parent_task=task_in_progress,
     )
     return subtask
 

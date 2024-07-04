@@ -62,7 +62,9 @@ class Migration(migrations.Migration):
                                 core.constants.Literals["ASSIGNED_RU"],
                             ),
                             (
-                                core.constants.Literals["IN_PROGRESS_INTERNAL"],
+                                core.constants.Literals[
+                                    "IN_PROGRESS_INTERNAL"
+                                ],
                                 core.constants.Literals["IN_PROGRESS_RU"],
                             ),
                             (
@@ -82,13 +84,16 @@ class Migration(migrations.Migration):
                 (
                     "planned_intensity",
                     models.IntegerField(
-                        verbose_name=core.constants.Literals["PLANNED_INTENSITY"]
+                        verbose_name=core.constants.Literals[
+                            "PLANNED_INTENSITY"
+                        ]
                     ),
                 ),
                 (
                     "deadline",
                     models.DateTimeField(
-                        null=True, verbose_name=core.constants.Literals["DEADLINE"]
+                        null=True,
+                        verbose_name=core.constants.Literals["DEADLINE"],
                     ),
                 ),
                 (
@@ -97,7 +102,9 @@ class Migration(migrations.Migration):
                         help_text=core.constants.Literals[
                             "ACTUAL_COMPLETION_TIME_HELP_TEXT"
                         ],
-                        verbose_name=core.constants.Literals["ACTUAL_COMPLETION_TIME"],
+                        verbose_name=core.constants.Literals[
+                            "ACTUAL_COMPLETION_TIME"
+                        ],
                     ),
                 ),
                 ("is_root_task", models.BooleanField(default=False)),
@@ -109,7 +116,9 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="subtasks",
                         to="tasks.taskmodel",
-                        verbose_name=core.constants.Literals["SUBTASK_VERBOSE_NAME"],
+                        verbose_name=core.constants.Literals[
+                            "SUBTASK_VERBOSE_NAME"
+                        ],
                     ),
                 ),
             ],

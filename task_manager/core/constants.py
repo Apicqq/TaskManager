@@ -5,17 +5,14 @@ class Errors(StrEnum):
     TASK_CANNOT_BE_COMPLETED_UNTIL_IN_PROGRESS = (
         'Задача может быть переведена в статус "Завершена" '
         "только после её принятия в работу"
-
     )
     TASK_CANNOT_BE_PAUSED_UNTIL_IN_PROGRESS = (
         'Задача может быть переведена в статус "Приостановлена" '
         "только после её принятия в работу"
-
     )
     TASK_CANNOT_BE_COMPLETED_UNTIL_ALL_SUBTASKS_ARE_DONE = (
         'Задача может быть переведена в статус "Завершена" '
         "только после того, как все подзадачи будут выполнены."
-
     )
     DEADLINE_CANNOT_BE_IN_THE_PAST = (
         "Дедлайн не может быть установлен в прошлом."

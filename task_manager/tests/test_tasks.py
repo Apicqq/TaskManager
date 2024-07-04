@@ -7,15 +7,13 @@ from tasks.models import TaskModel
 @pytest.mark.django_db
 def test_task_creation(client, assigned_task_data, subtask_create_form_data):
     response = client.post(
-        reverse("create_task"), data=dict(
-            **assigned_task_data,
-            **subtask_create_form_data
-        )
+        reverse("create_task"),
+        data=dict(**assigned_task_data, **subtask_create_form_data),
     )
     assert response.status_code == 302
-    assert TaskModel.objects.count() == 2, (
-        "Убедитесь, что задача создаётся корректно."
-    )
+    assert (
+        TaskModel.objects.count() == 2
+    ), "Убедитесь, что задача создаётся корректно."
     first_task = TaskModel.objects.get(pk=1)
     assert TaskModel.objects.get(pk=2).parent_task == first_task
 
@@ -23,28 +21,26 @@ def test_task_creation(client, assigned_task_data, subtask_create_form_data):
 @pytest.mark.django_db
 def test_task_detail_view(client, created_task):
     response = client.get(reverse("task_detail", kwargs={"task_id": 1}))
-    assert response.status_code == 200, (
-        "Убедитесь, что эндпоинт для просмотра данных о задачах доступен."
-    )
+    assert (
+        response.status_code == 200
+    ), "Убедитесь, что эндпоинт для просмотра данных о задачах доступен."
 
 
 @pytest.mark.django_db
 def test_task_update_valid_data(
-        client,
-        created_task,
-        subtask,
-        in_progress_task_data,
-        subtask_form_update_data
+    client,
+    created_task,
+    subtask,
+    in_progress_task_data,
+    subtask_form_update_data,
 ):
     response = client.post(
         reverse("update_task", kwargs={"task_id": 1}),
-        data=dict(
-            **in_progress_task_data,
-            **subtask_form_update_data
-        )
+        data=dict(**in_progress_task_data, **subtask_form_update_data),
     )
-    assert response.status_code == 302, ("Убедитесь, что данные передаются"
-                                         "в формы корректно.")
+    assert response.status_code == 302, (
+        "Убедитесь, что данные передаются" "в формы корректно."
+    )
 
 
 @pytest.mark.django_db
@@ -63,7 +59,9 @@ def test_task_update_invalid_data(client, created_task):
         "Код ответа отличается от ожидаемого. Проверьте корректность "
         "логики вашего эндпоинта."
     )
-    assert not response.context_data.get("form").is_valid(), (
+    assert not response.context_data.get(
+        "form"
+    ).is_valid(), (
         "При передаче некорректных данных в форму она не должна быть валидной."
     )
     assert response.context_data.get("form").errors is not None, (
@@ -75,13 +73,11 @@ def test_task_update_invalid_data(client, created_task):
 
 @pytest.mark.django_db
 def test_task_cannot_complete_if_not_in_progress(
-        client,
-        created_task,
-        completed_task_data
+    client, created_task, completed_task_data
 ):
     response = client.post(
         reverse("update_task", kwargs={"task_id": 1}),
-        data=dict(**completed_task_data)
+        data=dict(**completed_task_data),
     )
     assert response.status_code == 200, (
         "Код ответа отличается от ожидаемого. Проверьте корректность "
@@ -95,9 +91,7 @@ def test_task_cannot_complete_if_not_in_progress(
 
 @pytest.mark.django_db
 def test_task_cannot_be_paused_until_in_progress(
-        client,
-        created_task,
-        paused_task_data
+    client, created_task, paused_task_data
 ):
     response = client.post(
         reverse("update_task", kwargs={"task_id": 1}),
@@ -115,7 +109,7 @@ def test_task_cannot_be_paused_until_in_progress(
 
 @pytest.mark.django_db
 def test_task_cannot_be_completed_if_any_tasks_not_completed(
-        client, task_in_progress, completed_task_data, subtask
+    client, task_in_progress, completed_task_data, subtask
 ):
     response = client.post(
         reverse("update_task", kwargs={"task_id": 1}),
@@ -137,11 +131,11 @@ def test_task_cannot_be_completed_if_any_tasks_not_completed(
 
 @pytest.mark.django_db
 def test_task_completes_when_all_subtasks_are_able_to_be_finished(
-        client,
-        task_in_progress,
-        subtask_in_progress,
-        subtask_form_update_data,
-        completed_task_data,
+    client,
+    task_in_progress,
+    subtask_in_progress,
+    subtask_form_update_data,
+    completed_task_data,
 ):
     response = client.post(
         reverse("update_task", kwargs={"task_id": 1}),
@@ -162,9 +156,7 @@ def test_task_completes_when_all_subtasks_are_able_to_be_finished(
 
 
 @pytest.mark.django_db
-def test_disabled_fields_cannot_be_changed(
-        client, created_task
-):
+def test_disabled_fields_cannot_be_changed(client, created_task):
     new_planned_intensity = 100
     new_actual_completion_time = 350
     response = client.post(
@@ -185,16 +177,15 @@ def test_disabled_fields_cannot_be_changed(
         "логики вашего эндпоинта."
     )
     assert (
-            TaskModel.objects.first().planned_intensity
-            != new_planned_intensity
+        TaskModel.objects.first().planned_intensity != new_planned_intensity
     ), (
         "Данные в этом поле не подлежат изменению. Пожалуйста, проверьте"
         "корректность работы вашей формы."
     )
 
     assert (
-            TaskModel.objects.first().actual_completion_time
-            != new_actual_completion_time
+        TaskModel.objects.first().actual_completion_time
+        != new_actual_completion_time
     ), (
         "Данные в этом поле не подлежат изменению. Пожалуйста, проверьте"
         "корректность работы вашей формы."

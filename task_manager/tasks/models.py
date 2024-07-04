@@ -14,6 +14,7 @@ class TaskModel(models.Model):
     is_root_task, указывающее на "корневую" задачу, позволяющее отделять задачи
     от их подзадач.
     """
+
     name = models.CharField(
         max_length=Values.NAME_MAX_LENGTH,
         verbose_name=Literals.TASK_NAME,
@@ -44,9 +45,7 @@ class TaskModel(models.Model):
     deadline = models.DateTimeField(
         verbose_name=Literals.DEADLINE,
         null=True,
-        validators=[
-            validate_deadline
-        ]
+        validators=[validate_deadline],
     )
     actual_completion_time = models.IntegerField(
         Literals.ACTUAL_COMPLETION_TIME,
